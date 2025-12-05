@@ -50,6 +50,17 @@
             padding: 0 4px;
             border-radius: 4px;
         }
+
+        /* 모달 스타일 */
+        .modal {
+            transition: opacity 0.3s ease-in-out;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
     </style>
 </head>
 <body class="text-slate-800">
@@ -64,7 +75,7 @@
                     <span class="ml-3 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full hidden sm:inline-block">디지털 역량 강화 연수(업무편)</span>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="#" class="text-slate-500 hover:text-blue-600 px-3 py-2 rounded-md text-lg font-medium">사용 가이드</a>
+                    <button onclick="openGuide()" class="text-slate-500 hover:text-blue-600 px-3 py-2 rounded-md text-lg font-medium cursor-pointer">사용 가이드</button>
                 </div>
             </div>
         </div>
@@ -76,7 +87,7 @@
             <h1 class="text-3xl md:text-4xl font-bold mb-4">선생님의 업무 시간을 줄여주는 AI 프롬프트</h1>
             <p class="text-blue-100 text-lg mb-8 max-w-2xl mx-auto">
                 공문 작성부터 수업 설계, 가정통신문까지. <br>
-                복사해서 AI(ChatGPT, 뤼튼 등)에게 붙여넣기만 하세요.
+                복사해서 AI(ChatGPT, 뤼튼, 제미나이 등)에게 붙여넣기만 하세요.
             </p>
             
             <!-- 필터 버튼 -->
@@ -117,6 +128,42 @@
     <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center">
         <i class="fa-solid fa-check-circle text-green-400 mr-2"></i>
         <span>프롬프트가 복사되었습니다!</span>
+    </div>
+
+    <!-- 사용 가이드 모달 -->
+    <div id="guideModal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-11/12 max-w-lg p-6 relative transform transition-all scale-95 opacity-0" id="modalContent">
+            <button onclick="closeGuide()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-times text-xl"></i>
+            </button>
+            <h2 class="text-2xl font-bold mb-4 text-blue-600 flex items-center">
+                <i class="fa-solid fa-book-open mr-2"></i> 사용 가이드
+            </h2>
+            <div class="space-y-4 text-slate-700">
+                <div class="flex items-start">
+                    <span class="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5 flex-shrink-0">1</span>
+                    <p>원하는 <strong>주제(카테고리)</strong>를 선택하거나 전체 목록에서 카드를 찾습니다.</p>
+                </div>
+                <div class="flex items-start">
+                    <span class="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5 flex-shrink-0">2</span>
+                    <p>카드 하단의 <strong>'프롬프트 복사하기'</strong> 버튼을 클릭합니다.</p>
+                </div>
+                <div class="flex items-start">
+                    <span class="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5 flex-shrink-0">3</span>
+                    <p>ChatGPT, 뤼튼(Wrtn), 제미나이(Gemini) 등의 <strong>생성형 AI 채팅창에 붙여넣기(Ctrl+V)</strong> 합니다.</p>
+                </div>
+                <div class="flex items-start">
+                    <span class="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold mr-3 mt-0.5 flex-shrink-0">4</span>
+                    <p class="bg-yellow-50 p-2 rounded border border-yellow-200 text-sm">
+                        <i class="fa-solid fa-pen mr-1 text-yellow-500"></i>
+                        <strong>중요:</strong> <code>[ ]</code> 로 표시된 부분(예: [학년], [주제])만 선생님의 실제 상황에 맞게 수정해서 전송하세요.
+                    </p>
+                </div>
+            </div>
+            <div class="mt-8 text-center">
+                <button onclick="closeGuide()" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition">확인했습니다</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -366,9 +413,10 @@
                         <p class="text-slate-500 text-sm mb-4">${item.desc}</p>
                         
                         <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 relative group">
-                            <div class="text-xs text-slate-400 mb-1 absolute top-2 right-3 select-none">Preview</div>
-                            <p class="text-sm text-slate-700 leading-relaxed font-mono whitespace-pre-wrap max-h-32 overflow-y-auto custom-scrollbar line-clamp-4">${item.content}</p>
-                            <div class="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-slate-50 to-transparent"></div>
+                            <!-- Preview 라벨 제거됨 -->
+                            <!-- line-clamp-4 클래스 제거: 텍스트가 잘리지 않고 스크롤로 보이게 함 -->
+                            <p class="text-sm text-slate-700 leading-relaxed font-mono whitespace-pre-wrap max-h-32 overflow-y-auto custom-scrollbar">${item.content}</p>
+                            <div class="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-slate-50 to-transparent pointer-events-none"></div>
                         </div>
                     </div>
                     <div class="p-4 bg-slate-50 border-t border-slate-100 mt-auto">
@@ -428,6 +476,37 @@
                 toast.classList.add('translate-y-20', 'opacity-0');
             }, 2000);
         }
+
+        // 가이드 모달 함수
+        function openGuide() {
+            const modal = document.getElementById('guideModal');
+            const content = document.getElementById('modalContent');
+            modal.classList.add('active');
+            // 애니메이션 효과
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeGuide() {
+            const modal = document.getElementById('guideModal');
+            const content = document.getElementById('modalContent');
+            
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.remove('active');
+            }, 300);
+        }
+
+        // 모달 바깥 클릭 시 닫기
+        document.getElementById('guideModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeGuide();
+            }
+        });
     </script>
 </body>
 </html>
