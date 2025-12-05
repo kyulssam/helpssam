@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>교무실 AI 비서 - 디지털 역량 강화 연수용</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* 강원교육모두 Light 폰트 설정 */
+        @font-face {
+            font-family: 'GangwonEdu_OtneulyiMo_Light';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2201-2@1.0/GangwonEdu_OtneulyiMo_Light.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            font-family: 'GangwonEdu_OtneulyiMo_Light', 'Noto Sans KR', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        /* 스크롤바 커스텀 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        .prompt-card {
+            transition: all 0.3s ease;
+        }
+        .prompt-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .variable-highlight {
+            color: #2563eb;
+            font-weight: bold;
+            background-color: #eff6ff;
+            padding: 0 4px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- 네비게이션 바 -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fa-solid fa-chalkboard-user text-blue-600 text-2xl mr-3"></i>
+                    <span class="font-bold text-xl tracking-tight text-slate-800">교무실 AI 비서</span>
+                    <span class="ml-3 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full hidden sm:inline-block">디지털 역량 강화 연수(업무편)</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="#" class="text-slate-500 hover:text-blue-600 px-3 py-2 rounded-md text-lg font-medium">사용 가이드</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 히어로 섹션 -->
+    <div class="bg-blue-600 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">선생님의 업무 시간을 줄여주는 AI 프롬프트</h1>
+            <p class="text-blue-100 text-lg mb-8 max-w-2xl mx-auto">
+                공문 작성부터 수업 설계, 가정통신문까지. <br>
+                복사해서 AI(ChatGPT, 뤼튼 등)에게 붙여넣기만 하세요.
+            </p>
+            
+            <!-- 필터 버튼 -->
+            <div class="flex flex-wrap justify-center gap-2" id="filter-container">
+                <button onclick="filterPrompts('all')" class="filter-btn active bg-white text-blue-600 px-6 py-2 rounded-full font-bold shadow-md hover:bg-blue-50 transition">
+                    전체 보기
+                </button>
+                <button onclick="filterPrompts('admin')" class="filter-btn bg-blue-700 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-500 transition">
+                    📋 업무 효율화 (공문/계획)
+                </button>
+                <button onclick="filterPrompts('class')" class="filter-btn bg-blue-700 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-500 transition">
+                    💡 수업 설계 (아이디어/지도안)
+                </button>
+                <button onclick="filterPrompts('comm')" class="filter-btn bg-blue-700 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-500 transition">
+                    💌 소통/알림 (가정통신문)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 메인 컨텐츠 영역 -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <!-- 프롬프트 그리드 -->
+        <div id="prompt-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- 자바스크립트로 카드가 생성됩니다 -->
+        </div>
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="bg-slate-100 border-t border-slate-200 mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center text-slate-500">
+            <p class="mb-2">교원 디지털 역량 강화 연수 자료</p>
+            <p class="text-sm">본 사이트는 생성형 AI 활용 실습을 위해 제작되었습니다.</p>
+        </div>
+    </footer>
+
+    <!-- 토스트 알림 (복사 완료 시) -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center">
+        <i class="fa-solid fa-check-circle text-green-400 mr-2"></i>
+        <span>프롬프트가 복사되었습니다!</span>
+    </div>
+
+    <script>
+        // 프롬프트 데이터베이스
+        const prompts = [
+            {
+                id: 1,
+                category: 'admin',
+                badge: '공문/기획',
+                title: '현장체험학습 계획서 초안 작성',
+                desc: '복잡한 현장체험학습 계획 내부 기안문을 빠르게 작성합니다.',
+                content: `너는 지금부터 10년 차 베테랑 교무부장 선생님이야.
+다음 조건에 맞춰서 [현장체험학습 계획서] 내부 기안문 초안을 작성해줘.
+
+- 행사명: [행사 이름, 예: 2024학년도 가을 현장체험학습]
+- 일시: [날짜 및 시간]
+- 장소: [장소]
+- 대상: [학년 및 반]
+- 목적: 학생들의 정서 함양 및 단체 활동을 통한 협동심 배양
+- 포함될 항목: 목적, 방침, 세부 일정표(표 형식), 기대 효과, 안전 지도 계획(간략히)
+- 어조: 공적이고 명확한 공문서 스타일`
+            },
+            {
+                id: 11,
+                category: 'admin',
+                badge: '기안문 작성',
+                title: '전문적 기안문 작성 도우미',
+                desc: '사립학교 20년 경력의 노하우로 육하원칙과 규정에 맞는 완벽한 기안문을 작성합니다.',
+                content: `# 역할 
+- 너는 사립학교에서 20년간 근무해서 눈감고도 기안문을 작성하는 교사야. 
+# 목표 
+- 사용자가 제공한 정보를 바탕으로 공식적인 기안문을 작성해줘 
+
+# 지침 
+1. 사용자에게 필요한 정보를 요청한다. 
+- 제목 
+- 관련공문: 예시) 청암학교–OOO(2025.O.O.) 
+- 세부내용 
+- 붙임 파일명 
+2. 사용자의 정보를 바탕으로 예시를 참고하여 기안문을 작성한다. 
+3. 수정할 부분이 있는지 피드백을 요청한다. 
+
+# 주의사항 
+- 본문 내용은 육하 원칙에 맞게 작성한다. 
+- (첨부파일이 1개일 경우) 붙임: 현장체험학습 운영 계획 1부.  끝. 형식으로 작성한다. 
+- 띄어쓰기와 줄바꿈에 신경쓴다. 
+- 공식적인 어투로 작성한다. 
+
+# 예시 
+제목: 2025학년도 2학기 중학교 체험학습 운영 계획 
+1. 관련: 청암학교-3817(2025. 3. 21.) 2025학년도 학교교육과정계획 
+2. 2025학년도 2학기 중학교 체험학습 운영 계획을 다음과 같이 수립하여 운영하고자 합니다. 
+  가. 일시: 2025. 9. 2.(화) 09:20 ~ 15:00 
+  나. 장소: 신월 사과농장, 제천 의림지 일대
+  다. 대상: 인솔교사 12명 및 학생 30명 (붙임1 참조) 
+  라. 일정: 사과 따기 체험, 의림지 역사문화관 둘러보기, 의림지 일대 산책하기
+
+붙임  중학교 현장체험학습 계획서 및 안전지도 계획 1부.  끝.`
+            },
+            {
+                id: 2,
+                category: 'class',
+                badge: '수업 아이디어',
+                title: '창의적인 수업 도입(Hook) 아이디어',
+                desc: '수업 시작 5분, 학생들의 흥미를 확 끌어당길 아이디어를 얻으세요.',
+                content: `너는 창의적인 수업 설계를 잘하는 수석교사야.
+[과목명] 수업의 도입부에서 학생들의 호기심을 자극할 수 있는 'Hook(도입)' 아이디어 3가지를 제안해줘.
+
+- 학년: [대상 학년, 예: 초등학교 5학년]
+- 단원/주제: [수업 주제, 예: 조선 후기의 사회 변화]
+- 아이디어 조건:
+  1. 퀴즈, 짧은 영상, 역할극 등 다양한 활동 형태 포함
+  2. 준비물이 많이 필요 없는 간단한 활동 위주
+  3. 각 아이디어별로 예상 소요 시간과 진행 방법 간략 설명`
+            },
+            {
+                id: 3,
+                category: 'comm',
+                badge: '가정통신문',
+                title: '따뜻한 가정통신문 인사말 작성',
+                desc: '학부모님께 보내는 가정통신문, 첫 문장이 고민될 때 사용하세요.',
+                content: `너는 학부모님과 소통을 잘하는 다정하고 신뢰감 있는 담임 선생님이야.
+[주제]에 관한 가정통신문을 작성하려고 하는데, 서두에 들어갈 인사말을 작성해줘.
+
+- 상황/계절: [현재 계절 또는 상황, 예: 환절기, 새 학기 시작]
+- 가정통신문 주제: [주제, 예: 학부모 상담 주간 안내]
+- 요청 사항:
+  1. 너무 딱딱하지 않고 정중하며 부드러운 말투 사용
+  2. 계절감이나 날씨 이야기를 자연스럽게 섞을 것
+  3. 총 3가지 다른 버전으로 작성해줘`
+            },
+            {
+                id: 12,
+                category: 'comm',
+                badge: '새 학기 인사',
+                title: '새 학기 학급 안내 및 인사말',
+                desc: '학부모님께 신뢰를 주고 첫인상을 좋게 만드는 새 학기 가정통신문입니다.',
+                content: `너는 학부모님께 신뢰를 주는 따뜻하고 열정적인 담임 선생님이야.
+새 학기를 맞이하여 학부모님께 보낼 첫 가정통신문(학급 안내) 내용을 작성해줘.
+
+- 학년 및 반: [학년/반]
+- 교사의 교육 철학/급훈: [교육 철학 또는 급훈, 예: 스스로 서고 더불어 사는 어린이]
+- 학급 운영 중점 사항: [강조하고 싶은 점, 예: 독서 습관, 친구 배려]
+- 학부모님께 당부하고 싶은 말: [준비물, 등교 시간 준수 등]
+- 포함 내용:
+  1. 정중하고 따뜻한 첫인사
+  2. 담임 교사 소개 및 다짐
+  3. 학급 운영 목표 및 당부 사항
+  4. 기대와 감사의 끝인사`
+            },
+            {
+                id: 4,
+                category: 'class',
+                badge: '수업 계획',
+                title: '50분 수업 지도안(약안) 생성',
+                desc: '수업의 흐름을 잡고 싶을 때, 구조화된 지도안을 만들어줍니다.',
+                content: `다음 주제로 [수업 시간, 예: 45분] 수업 지도안(약안)을 표 형식으로 작성해줘.
+
+- 학년 및 과목: [학년/과목]
+- 학습 목표: [학습 목표 입력]
+- 수업 단계: 도입(10%) - 전개(80%) - 정리(10%) 비율로 구성
+- 포함 내용: 각 단계별 주요 활동, 교사 활동, 학생 활동, 활용 기자재 및 유의점
+- 평가 계획: 수업 중 관찰 평가 혹은 형성 평가 내용 1가지 포함`
+            },
+            {
+                id: 5,
+                category: 'admin',
+                badge: '업무 메일',
+                title: '외부 강사 섭외 요청 메일',
+                desc: '외부 강사나 전문가에게 정중하게 강의를 요청하는 메일 초안입니다.',
+                content: `학교 행사에 모실 외부 강사님께 보낼 섭외 요청 이메일을 작성해줘.
+
+- 행사명: [행사 이름]
+- 강연 주제: [강연 주제]
+- 일시 및 장소: [날짜/시간/장소]
+- 대상: [청중 대상]
+- 요청 사항: 강의 가능 여부 및 강사료 문의 포함
+- 톤앤매너: 매우 정중하고 예의 바르게, 학교의 교육적 취지를 잘 설명하며 부탁하는 어조`
+            },
+            {
+                id: 6,
+                category: 'class',
+                badge: '평가 문항',
+                title: '단원 마무리 형성평가 문항 제작',
+                desc: '객관식, 주관식 등 다양한 형태의 평가 문항을 즉시 생성합니다.',
+                content: `너는 교육과정 평가 전문가야.
+아래 내용을 바탕으로 형성평가 문항 5문제를 출제해줘.
+
+- 과목 및 단원: [과목/단원명]
+- 난이도: 상 1문제, 중 2문제, 하 2문제
+- 문제 유형: 4지 선다형 객관식 3문제 + 단답형 주관식 2문제
+- 출력 형식: 문제, 정답, 그리고 각 문제에 대한 친절한 해설을 포함할 것`
+            },
+            {
+                id: 7,
+                category: 'comm',
+                badge: '알림장',
+                title: '내일의 알림장 및 준비물 안내',
+                desc: '학생들이 잊지 않도록 꼼꼼하고 친절하게 안내하는 알림장 멘트입니다.',
+                content: `내일 학생들에게 전달할 알림장 내용을 정리해줘.
+초등학생들이 이해하기 쉽고, 말투는 친절하게 해줘.
+
+- 필수로 전달할 내용: [준비물 1, 숙제 내용, 안내장 배부 여부 등]
+- 강조할 점: [예: 내일 비가 오니 우산 챙기기, 안전 지도 등]
+- 마지막에 아이들을 격려하는 짧은 한마디 추가`
+            },
+            {
+                id: 8,
+                category: 'class',
+                badge: '생활지도',
+                title: '학생 생활 지도 도우미',
+                desc: '문제 행동의 원인(관심끌기, 회피 등)과 해결 방안, 지도 팁을 제공합니다.',
+                content: `# 역할 
+- 너는 20년 경력의 학생 생활지도 전문가야. 
+# 목표 
+- 사용자가 학생의 문제 행동을 입력하면 그 문제 행동의 원인(관심끌기, 회피 등), 해결방안, 지도팁을 제공해줘.
+
+- 학생의 문제 행동: [여기에 내용을 입력하세요]`
+            },
+            {
+                id: 9,
+                category: 'class',
+                badge: '학생 칭찬',
+                title: '학생 칭찬 도우미 (특수교육)',
+                desc: '발달장애 학생들의 행동 속에서 긍정적인 면을 찾아 칭찬합니다.',
+                content: `# 역할 
+- 너는 칭찬을 잘하는 20년 경력의 교사야. 
+# 목표 
+- 사용자가 제공하는 내용을 분석하여 그 속에 숨겨져 있는 학생에 대한 칭찬거리를 찾아줘. 
+# 맥락 
+- 학생들은 발달장애 특수학교 중학교 1~3학년 학생들이야. 
+- 나는 교사로서 학생들을 긍정적 관점에서 보고 싶어.
+
+- 관찰 내용: [여기에 학생의 행동이나 상황을 입력하세요]`
+            },
+            {
+                id: 10,
+                category: 'class',
+                badge: '수업 자료',
+                title: '수준별 맞춤 활동지 생성',
+                desc: '발달장애 중1 수학 수업을 위한 상/중/하 수준별 활동지를 구성합니다.',
+                content: `# 역할 
+- 너는 현직교사이자 수준별 교육 전문가야. 
+# 목표 
+- 사용자가 제공하는 활동지를 상, 중, 하 수준의 활동지로 만들어 제공해줘. 
+# 맥락 
+- 발달장애 중학교 1학년 수학 수업이야. 
+- 수준이 '중'인 학생들이 절대다수야 반영해줘. 
+# 지침 
+- 사용자가 제공하는 활동지를 깊이 분석해. 
+- 활동지의 내용을 기반으로 수준별로 상, 중, 하로 활동지를 구성해줘.
+
+- 활동지 내용: [여기에 내용을 붙여넣으세요]`
+            }
+        ];
+
+        // 초기 렌더링
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPrompts('all');
+        });
+
+        // 프롬프트 렌더링 함수
+        function renderPrompts(filter) {
+            const grid = document.getElementById('prompt-grid');
+            grid.innerHTML = ''; // 기존 내용 초기화
+
+            const filteredData = filter === 'all' 
+                ? prompts 
+                : prompts.filter(p => p.category === filter);
+
+            filteredData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'prompt-card bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-full';
+                
+                // 카드 색상 결정 (카테고리별)
+                let badgeColor = 'bg-slate-100 text-slate-600';
+                if(item.category === 'admin') badgeColor = 'bg-indigo-100 text-indigo-700';
+                if(item.category === 'class') badgeColor = 'bg-emerald-100 text-emerald-700';
+                if(item.category === 'comm') badgeColor = 'bg-orange-100 text-orange-700';
+
+                card.innerHTML = `
+                    <div class="p-6 flex-grow">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold px-2 py-1 rounded ${badgeColor}">${item.badge}</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-slate-800">${item.title}</h3>
+                        <p class="text-slate-500 text-sm mb-4">${item.desc}</p>
+                        
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 relative group">
+                            <div class="text-xs text-slate-400 mb-1 absolute top-2 right-3 select-none">Preview</div>
+                            <p class="text-sm text-slate-700 leading-relaxed font-mono whitespace-pre-wrap max-h-32 overflow-y-auto custom-scrollbar line-clamp-4">${item.content}</p>
+                            <div class="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-slate-50 to-transparent"></div>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-slate-50 border-t border-slate-100 mt-auto">
+                        <button onclick="copyToClipboard(this, \`${item.content.replace(/`/g, '\\`')}\`)" class="w-full bg-white hover:bg-blue-50 text-blue-600 font-bold py-3 px-4 rounded-lg border border-blue-200 hover:border-blue-300 transition flex items-center justify-center gap-2 group">
+                            <i class="fa-regular fa-copy group-hover:scale-110 transition-transform"></i>
+                            프롬프트 복사하기
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // 카테고리 필터링 함수
+        function filterPrompts(category) {
+            // 버튼 스타일 변경
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'text-blue-600', 'shadow-md');
+                btn.classList.add('bg-blue-700', 'text-white', 'hover:bg-blue-500');
+            });
+            
+            // 클릭된 버튼 스타일 활성화
+            const activeBtn = event.target;
+            activeBtn.classList.remove('bg-blue-700', 'text-white', 'hover:bg-blue-500');
+            activeBtn.classList.add('bg-white', 'text-blue-600', 'shadow-md');
+
+            renderPrompts(category);
+        }
+
+        // 복사 기능 함수
+        function copyToClipboard(button, text) {
+            // 텍스트를 클립보드에 복사
+            const tempInput = document.createElement("textarea");
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+
+            // 버튼 피드백
+            const originalHTML = button.innerHTML;
+            button.innerHTML = `<i class="fa-solid fa-check"></i> 복사 완료!`;
+            button.classList.add('bg-blue-600', 'text-white', 'border-transparent');
+            button.classList.remove('bg-white', 'text-blue-600');
+
+            // 토스트 알림 표시
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            
+            setTimeout(() => {
+                // 버튼 원상복구
+                button.innerHTML = originalHTML;
+                button.classList.remove('bg-blue-600', 'text-white', 'border-transparent');
+                button.classList.add('bg-white', 'text-blue-600');
+                
+                // 토스트 숨김
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
